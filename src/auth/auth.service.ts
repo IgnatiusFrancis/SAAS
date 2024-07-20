@@ -76,6 +76,7 @@ export class AuthService {
   private async getUserByEmail(email: string) {
     return this.prismaService.user.findUnique({
       where: { email },
+      include: { subscriptions: true, images: true },
     });
   }
 
