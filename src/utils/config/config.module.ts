@@ -9,6 +9,7 @@ import * as Joi from 'joi';
   imports: [
     NestConfigModule.forRoot({
       isGlobal: true,
+      cache: true,
       validationSchema: Joi.object({
         DATABASE_URL: Joi.string().required(),
         PORT: Joi.string().required(),
@@ -17,7 +18,9 @@ import * as Joi from 'joi';
         CLOUDINARY_API_SECRET: Joi.string().required(),
         CLOUDINARY_API_KEY: Joi.string().required(),
         PAYSTACK_SECRETKEY: Joi.string().required(),
-        PLAN: Joi.string().required(),
+        REDIS_HOST: Joi.string().required(),
+        REDIS_PORT: Joi.string().required(),
+        REDIS_PASSWORD: Joi.string().optional(),
       }),
     }),
   ],

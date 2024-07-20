@@ -35,7 +35,6 @@ export class SubscriptionController {
   @UseGuards(JwtGuard)
   @Post('cancel/:subscriptionId')
   public async cancelSubscription(
-    @CurrentUser() user: User,
     @Param('subscriptionId') subscriptionId: string,
   ) {
     return this.subscriptionService.cancelSubscription(subscriptionId);

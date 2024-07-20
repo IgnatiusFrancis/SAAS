@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from './utils';
@@ -20,12 +20,28 @@ import { BullModule } from '@nestjs/bull';
     ImageModule,
     BullModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        redis: {
-          host: configService.get('REDIS_HOST') || 'localhost',
-          port: configService.get('REDIS_PORT') || 6379,
-        },
-      }),
+      useFactory: async (configService: ConfigService) => {
+        const logger = new Logger('BullModuleConfig');
+        const environment = configService.get<string>('NODE_ENV');
+        logger.log(`Current environment: ${environment}`);
+        const isProduction =
+          configService.get<string>('NODE_ENV') === 'production';
+        const redisOptions = {
+          host: isProduction
+            ? configService.get<string>('REDIS_HOST')
+            : 'localhost',
+          port: isProduction
+            ? parseInt(configService.get<string>('REDIS_PORT'))
+            : 6379,
+          ...(isProduction && {
+            password: configService.get<string>('REDIS_PASSWORD'),
+          }),
+        };
+
+        return {
+          redis: redisOptions,
+        };
+      },
       inject: [ConfigService],
     }),
   ],
