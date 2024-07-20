@@ -6,6 +6,7 @@ import {
   Req,
   Res,
   Logger,
+  Param,
 } from '@nestjs/common';
 import { SubscriptionService } from './subscription.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
@@ -29,6 +30,15 @@ export class SubscriptionController {
       user.id,
       createSubscriptionDto,
     );
+  }
+
+  @UseGuards(JwtGuard)
+  @Post('cancel/:subscriptionId')
+  public async cancelSubscription(
+    @CurrentUser() user: User,
+    @Param('subscriptionId') subscriptionId: string,
+  ) {
+    return this.subscriptionService.cancelSubscription(subscriptionId);
   }
 
   @Post('webhook')

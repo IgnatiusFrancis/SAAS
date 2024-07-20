@@ -69,17 +69,13 @@ export class SubscriptionService {
           next_payment_date,
         } = event.data;
 
-        // Retrieve user by customer email
-        const user = await this.prisma.user.findUnique({
-          where: { email: customer.email },
-        });
-
+        const user = await this.authService.getUserByEmail(customer.email);
         if (user) {
           this.logger.debug(
             `About updating subscription details from processed webhook`,
           );
           await this.prisma.subscription.upsert({
-            where: { id: subscription_code },
+            where: { subscriptionCode: subscription_code },
             update: {
               plan: plan.name,
               status,
@@ -87,7 +83,7 @@ export class SubscriptionService {
               nextPaymentDate: new Date(next_payment_date),
             },
             create: {
-              id: subscription_code,
+              subscriptionCode: subscription_code,
               userId: user.id,
               plan: plan.name,
               status,
@@ -106,10 +102,77 @@ export class SubscriptionService {
         }
 
         this.logger.debug(`Successfully updated all fields`);
+      } else if (event.event === 'subscription.update') {
+        this.logger.debug(`Subscription update webhook received`);
+        const { subscription_code, status, next_payment_date } = event.data;
+
+        const subscription = await this.prisma.subscription.findUnique({
+          where: { id: subscription_code },
+        });
+
+        if (subscription) {
+          await this.prisma.subscription.update({
+            where: { id: subscription_code },
+            data: {
+              status,
+              nextPaymentDate: new Date(next_payment_date),
+            },
+          });
+        }
+      } else if (event.event === 'subscription.cancelled') {
+        this.logger.debug(`Subscription cancellation webhook received`);
+        const { subscription_code } = event.data;
+
+        const subscription = await this.prisma.subscription.findUnique({
+          where: { subscriptionCode: subscription_code },
+        });
+
+        if (subscription) {
+          await this.prisma.subscription.update({
+            where: { subscriptionCode: subscription_code },
+            data: { status: 'cancelled' },
+          });
+
+          const user = await this.prisma.user.findUnique({
+            where: { id: subscription.userId },
+          });
+
+          if (user) {
+            await this.prisma.user.update({
+              where: { id: user.id },
+              data: { subscriptionActive: Status.Inactive },
+            });
+          }
+        }
       }
     } catch (error) {
-      console.error('Error handling webhook:', error);
+      this.logger.error('Error handling webhook:', error);
       throw error;
+    }
+  }
+
+  public async cancelSubscription(subscriptionId: string) {
+    try {
+      this.logger.debug(`Cancelling subscription with Id: ${subscriptionId}`);
+
+      const subscription = await this.prisma.subscription.findFirstOrThrow({
+        where: { id: subscriptionId },
+      });
+
+      const url = `${this.baseUrl}/subscription/${subscription.subscriptionCode}/cancel`;
+      const headers = { Authorization: `Bearer ${this.secretKey}` };
+
+      const response = await firstValueFrom(
+        this.httpService.post(url, {}, { headers }),
+      );
+
+      this.logger.debug(
+        `Subscription cancelled successfully: ${response.data}`,
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error('Error cancelling subscription:', error.message);
+      throw new Error(`Error cancelling subscription: ${error.message}`);
     }
   }
 }
