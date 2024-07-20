@@ -24,7 +24,7 @@ export class SubscriptionController {
     @CurrentUser() user: User,
     @Body() createSubscriptionDto: CreateSubscriptionDto,
   ) {
-    this.logger.verbose('Initializing subscription');
+    this.logger.verbose('Initializing subscription controller');
     return this.subscriptionService.initializeSubscription(
       user.id,
       createSubscriptionDto,

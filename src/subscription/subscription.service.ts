@@ -20,7 +20,7 @@ export class SubscriptionService {
     private readonly prisma: PrismaService,
   ) {
     this.baseUrl = this.configService.get<string>('PAYSTACK_BASEURL');
-    this.secretKey = this.configService.get<string>('PAYSTACK_SECRET_KEY');
+    this.secretKey = this.configService.get<string>('PAYSTACK_SECRETKEY');
   }
 
   public async initializeSubscription(
@@ -34,16 +34,23 @@ export class SubscriptionService {
       const headers = { Authorization: `Bearer ${this.secretKey}` };
       const data = {
         email: user.email,
+        amount: createSubscriptionDto.amount,
         plan: createSubscriptionDto.plan,
       };
 
       const response = await firstValueFrom(
         this.httpService.post(url, data, { headers }),
       );
-      this.logger.debug('Initializing subscription successfully');
+
+      this.logger.debug('Subscription initialized successfully');
       return response.data;
     } catch (error) {
-      throw error;
+      if (error.response) {
+        this.logger.error('Error response data:', error.response.data);
+        throw new Error(`Paystack error: ${error.response.data.message}`);
+      }
+      this.logger.error('Error initializing subscription:', error.message);
+      throw new Error('Error initializing subscription');
     }
   }
 
