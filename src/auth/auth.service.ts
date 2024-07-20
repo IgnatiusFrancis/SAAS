@@ -118,11 +118,12 @@ export class AuthService {
   }
 
   private formatSignupResponse(newUser: User) {
+    const { password, ...data } = newUser;
     return {
       success: true,
       message: 'Signup successful',
       result: {
-        ...newUser,
+        ...data,
       },
     };
   }
