@@ -79,6 +79,13 @@ export class AuthService {
     });
   }
 
+  public async getUserById(id: string) {
+    return this.prismaService.user.findUnique({
+      where: { id },
+      include: { subscriptions: true },
+    });
+  }
+
   private checkUserExistence(user: any) {
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);

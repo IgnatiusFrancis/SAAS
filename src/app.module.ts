@@ -7,9 +7,11 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { UserInterceptor } from './utils/interceptors/user.interceptor';
 import { AllExceptionsFilter } from './utils/filters/httpExceptionFilter';
 import { JwtAuthService } from './utils/token.generators';
+import { SubscriptionModule } from './subscription/subscription.module';
+import { ImageModule } from './image/image.module';
 
 @Module({
-  imports: [ConfigModule, AuthModule],
+  imports: [ConfigModule, AuthModule, SubscriptionModule, ImageModule],
   controllers: [AppController],
   providers: [
     AppService,
