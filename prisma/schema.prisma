@@ -11,7 +11,8 @@ model User {
   id        String   @id @default(uuid())
   email              String       @unique
   password           String
-  subscriptionActive Boolean      @default(false)
+  subscriptionActive Status      @default(Inactive) 
+  next_payment_date DateTime?
   createdAt          DateTime     @default(now())
   updatedAt          DateTime     @updatedAt
   subscriptions      Subscription[]
@@ -19,14 +20,17 @@ model User {
 }
 
 model Subscription {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id],onDelete: Cascade)
-  plan      String
-  status    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                String   @id @default(uuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan              String
+  status            String
+  amount            Int   
+  nextPaymentDate   DateTime
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
+
 
 model Image {
   id        String   @id @default(uuid())
@@ -35,4 +39,9 @@ model Image {
   url       String
   metadata  Json
   createdAt DateTime @default(now())
+}
+
+enum Status {
+    Active
+    Inactive
 }

@@ -1,13 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import { PrismaService } from 'src/utils/prisma';
 import { AuthService } from 'src/auth/auth.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
+import { Status } from '@prisma/client';
 
 @Injectable()
 export class SubscriptionService {
+  private readonly logger = new Logger(SubscriptionService.name);
   private readonly baseUrl: string;
   private readonly secretKey: string;
 
@@ -26,6 +28,7 @@ export class SubscriptionService {
     createSubscriptionDto: CreateSubscriptionDto,
   ) {
     try {
+      this.logger.debug('Initializing subscription starting...');
       const user = await this.authService.getUserById(userId);
       const url = `${this.baseUrl}/transaction/initialize`;
       const headers = { Authorization: `Bearer ${this.secretKey}` };
@@ -37,6 +40,7 @@ export class SubscriptionService {
       const response = await firstValueFrom(
         this.httpService.post(url, data, { headers }),
       );
+      this.logger.debug('Initializing subscription successfully');
       return response.data;
     } catch (error) {
       throw error;
@@ -45,24 +49,59 @@ export class SubscriptionService {
 
   public async handleWebhook(event: any) {
     try {
-      if (
-        event.event === 'subscription.create' ||
-        event.event === 'subscription.update'
-      ) {
-        const { user_id, plan, status } = event.data;
-        await this.prisma.subscription.create({
-          data: {
-            userId: user_id,
-            plan,
-            status,
-          },
+      if (event.event === 'subscription.create') {
+        this.logger.debug(
+          `Webhook received and about to process: ${event.event}`,
+        );
+        const {
+          subscription_code,
+          status,
+          amount,
+          plan,
+          customer,
+          next_payment_date,
+        } = event.data;
+
+        // Retrieve user by customer email
+        const user = await this.prisma.user.findUnique({
+          where: { email: customer.email },
         });
-        await this.prisma.user.update({
-          where: { id: user_id },
-          data: { subscriptionActive: status === 'active' },
-        });
+
+        if (user) {
+          this.logger.debug(
+            `About updating subscription details from processed webhook`,
+          );
+          await this.prisma.subscription.upsert({
+            where: { id: subscription_code },
+            update: {
+              plan: plan.name,
+              status,
+              amount,
+              nextPaymentDate: new Date(next_payment_date),
+            },
+            create: {
+              id: subscription_code,
+              userId: user.id,
+              plan: plan.name,
+              status,
+              amount,
+              nextPaymentDate: new Date(next_payment_date),
+            },
+          });
+
+          this.logger.debug(
+            `About updating user details from processed webhook`,
+          );
+          await this.prisma.user.update({
+            where: { id: user.id },
+            data: { subscriptionActive: Status.Active },
+          });
+        }
+
+        this.logger.debug(`Successfully updated all fields`);
       }
     } catch (error) {
+      console.error('Error handling webhook:', error);
       throw error;
     }
   }
