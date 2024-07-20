@@ -3,6 +3,7 @@ import * as bcrypt from 'bcryptjs';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { JwtAuthService } from '../utils/token.generators';
 import { PrismaService } from '../utils/prisma';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -87,7 +88,7 @@ export class AuthService {
     });
   }
 
-  private checkUserExistence(user: any) {
+  private checkUserExistence(user: User) {
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
@@ -104,23 +105,24 @@ export class AuthService {
     }
   }
 
-  private formatLoginResponse(user: any, token: string) {
+  private formatLoginResponse(user: User, token: string) {
+    const { password, ...data } = user;
     return {
       success: true,
       message: 'Login successful',
       result: {
-        user,
+        ...data,
         token,
       },
     };
   }
 
-  private formatSignupResponse(newUser: any) {
+  private formatSignupResponse(newUser: User) {
     return {
       success: true,
       message: 'Signup successful',
       result: {
-        user: newUser,
+        ...newUser,
       },
     };
   }

@@ -17,10 +17,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signin')
-  login(
-    @Body() createAuthDto: CreateAuthDto,
-    @Res({ passthrough: true }) response: Response,
-  ) {
+  login(@Body() createAuthDto: CreateAuthDto) {
     return this.authService.signin(createAuthDto);
   }
 
