@@ -9,9 +9,26 @@ import { AllExceptionsFilter } from './utils/filters/httpExceptionFilter';
 import { JwtAuthService } from './utils/token.generators';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { ImageModule } from './image/image.module';
+import { ConfigService } from '@nestjs/config';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
-  imports: [ConfigModule, AuthModule, SubscriptionModule, ImageModule],
+  imports: [
+    ConfigModule,
+    AuthModule,
+    SubscriptionModule,
+    ImageModule,
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        redis: {
+          host: configService.get('REDIS_HOST') || 'localhost',
+          port: configService.get('REDIS_PORT') || 6379,
+        },
+      }),
+      inject: [ConfigService],
+    }),
+  ],
   controllers: [AppController],
   providers: [
     AppService,
