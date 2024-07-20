@@ -5,6 +5,7 @@ import { HttpModule } from '@nestjs/axios';
 import { PrismaService } from 'src/utils/prisma';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthService } from 'src/utils/token.generators';
+import { RedisService } from './redis.service';
 
 @Module({
   imports: [
@@ -16,6 +17,12 @@ import { JwtAuthService } from 'src/utils/token.generators';
     }),
   ],
   controllers: [SubscriptionController],
-  providers: [SubscriptionService, PrismaService, AuthService, JwtAuthService],
+  providers: [
+    SubscriptionService,
+    PrismaService,
+    AuthService,
+    JwtAuthService,
+    RedisService,
+  ],
 })
 export class SubscriptionModule {}

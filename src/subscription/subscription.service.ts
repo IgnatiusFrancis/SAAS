@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
@@ -155,16 +155,22 @@ export class SubscriptionService {
     try {
       this.logger.debug(`Cancelling subscription with Id: ${subscriptionId}`);
 
-      const subscription = await this.prisma.subscription.findFirstOrThrow({
-        where: { id: subscriptionId },
+      const subscription = await this.prisma.subscription.findUnique({
+        where: { id: subscriptionId, status: 'active' },
       });
-
-      const url = `${this.baseUrl}/subscription/${subscription.subscriptionCode}/cancel`;
+      console.log(subscription.subscriptionCode);
+      if (!subscription) {
+        throw new HttpException('No Subscription found', HttpStatus.NOT_FOUND);
+      }
+      const url = `${this.baseUrl}/subscription/disable`;
       const headers = { Authorization: `Bearer ${this.secretKey}` };
 
-      const response = await firstValueFrom(
-        this.httpService.post(url, {}, { headers }),
-      );
+      const data = {
+        code: subscription.subscriptionCode,
+        token: headers,
+      };
+
+      const response = await firstValueFrom(this.httpService.post(url, data));
 
       this.logger.debug(
         `Subscription cancelled successfully: ${response.data}`,

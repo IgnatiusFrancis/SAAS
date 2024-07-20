@@ -12,13 +12,14 @@ import { UseGuards } from '@nestjs/common';
 import { JwtGuard } from 'src/utils/guards/jwtAuth.guard';
 import { CurrentUser } from 'src/utils/decorators';
 import { User } from '@prisma/client';
+import { SubscriptionGuard } from 'src/utils/guards/subscription.guard';
 
 @Controller('image')
 export class ImageController {
   constructor(private readonly imageService: ImageService) {}
 
   @Post('upload')
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, SubscriptionGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(
     @CurrentUser() user: User,

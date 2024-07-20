@@ -42,6 +42,7 @@ export class JwtGuard implements CanActivate {
         );
       }
 
+      request.user = user;
       return true;
     } catch (error) {
       throw error;
