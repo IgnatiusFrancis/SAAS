@@ -58,71 +58,70 @@ export class SubscriptionService {
 
   public async handleWebhook(event: any, res: Response) {
     try {
-      if (this.verifySignature(event)) {
-        if (event.event === 'subscription.create') {
+      if (event.event === 'subscription.create') {
+        this.logger.debug(
+          `Webhook received and about to process: ${event.event}`,
+        );
+        const {
+          subscription_code,
+          status,
+          amount,
+          plan,
+          customer,
+          next_payment_date,
+        } = event.data;
+
+        const user = await this.authService.getUserByEmail(customer.email);
+        if (user) {
           this.logger.debug(
-            `Webhook received and about to process: ${event.event}`,
+            `About updating subscription details from processed webhook`,
           );
-          const {
-            subscription_code,
-            status,
-            amount,
-            plan,
-            customer,
-            next_payment_date,
-          } = event.data;
-
-          const user = await this.authService.getUserByEmail(customer.email);
-          if (user) {
-            this.logger.debug(
-              `About updating subscription details from processed webhook`,
-            );
-            await this.prisma.subscription.upsert({
-              where: { subscriptionCode: subscription_code },
-              update: {
-                plan: plan.name,
-                status,
-                amount,
-                nextPaymentDate: new Date(next_payment_date),
-              },
-              create: {
-                subscriptionCode: subscription_code,
-                userId: user.id,
-                plan: plan.name,
-                status,
-                amount,
-                nextPaymentDate: new Date(next_payment_date),
-              },
-            });
-
-            this.logger.debug(
-              `About updating user details from processed webhook`,
-            );
-            await this.prisma.user.update({
-              where: { id: user.id },
-              data: { subscriptionActive: Status.Active },
-            });
-          }
-
-          this.logger.debug(`Successfully updated all fields`);
-        } else if (event.event === 'subscription.update') {
-          this.logger.debug(`Subscription update webhook received`);
-          const { subscription_code, status, next_payment_date } = event.data;
-
-          const subscription = await this.prisma.subscription.findUnique({
-            where: { id: subscription_code },
+          await this.prisma.subscription.upsert({
+            where: { subscriptionCode: subscription_code },
+            update: {
+              plan: plan.name,
+              status,
+              amount,
+              nextPaymentDate: new Date(next_payment_date),
+            },
+            create: {
+              subscriptionCode: subscription_code,
+              userId: user.id,
+              plan: plan.name,
+              status,
+              amount,
+              nextPaymentDate: new Date(next_payment_date),
+            },
           });
 
-          if (subscription) {
-            await this.prisma.subscription.update({
-              where: { id: subscription_code },
-              data: {
-                status,
-                nextPaymentDate: new Date(next_payment_date),
-              },
-            });
-          }
+          this.logger.debug(
+            `About updating user details from processed webhook`,
+          );
+          await this.prisma.user.update({
+            where: { id: user.id },
+            data: { subscriptionActive: Status.Active },
+          });
         }
+
+        this.logger.debug(`Successfully updated all fields`);
+      } else if (event.event === 'subscription.update') {
+        this.logger.debug(`Subscription update webhook received`);
+        const { subscription_code, status, next_payment_date } = event.data;
+
+        const subscription = await this.prisma.subscription.findUnique({
+          where: { id: subscription_code },
+        });
+
+        if (subscription) {
+          await this.prisma.subscription.update({
+            where: { id: subscription_code },
+            data: {
+              status,
+              nextPaymentDate: new Date(next_payment_date),
+            },
+          });
+        }
+
         res.status(200).send();
       } else {
         this.logger.error('Invalid webhook signature');
@@ -132,15 +131,5 @@ export class SubscriptionService {
       this.logger.error('Error handling webhook:', error);
       throw error;
     }
-  }
-
-  private verifySignature(req: Request): boolean {
-    const hash = crypto
-      .createHmac('sha512', this.secretKey)
-      .update(JSON.stringify(req.body))
-      .digest('hex');
-
-    this.logger.debug('Completed verification', req.body, hash);
-    return hash === req.headers['x-paystack-signature'];
   }
 }
