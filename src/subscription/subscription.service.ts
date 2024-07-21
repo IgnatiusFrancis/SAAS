@@ -140,7 +140,7 @@ export class SubscriptionService {
       .update(JSON.stringify(req.body))
       .digest('hex');
 
-    this.logger.debug('Completed verification', req.body);
+    this.logger.debug('Completed verification', req.body, hash);
     return hash === req.headers['x-paystack-signature'];
   }
 }
