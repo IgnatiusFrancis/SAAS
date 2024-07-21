@@ -12,6 +12,7 @@ import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { User } from '@prisma/client';
 import { CurrentUser } from 'src/utils/decorators';
 import { JwtGuard } from 'src/utils/guards/jwtAuth.guard';
+import { Response } from 'express';
 
 @Controller('subscription')
 export class SubscriptionController {
@@ -35,6 +36,6 @@ export class SubscriptionController {
   async webhook(@Req() req: Request, @Res() res: Response) {
     this.logger.verbose('Received Paystack webhook');
     const event = req.body;
-    await this.subscriptionService.handleWebhook(event);
+    await this.subscriptionService.handleWebhook(event, res);
   }
 }

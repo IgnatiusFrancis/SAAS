@@ -1,4 +1,4 @@
-#SAAS API Documentation
+# SAAS API Documentation
 
 This is a subscription-based application using Paystack, BullMQ, and NestJS modular architecture.
 
@@ -143,9 +143,9 @@ To contribute to this project, please follow these guidelines:
 
 For any inquiries, please reach out to:
 
-Name: Ignatius Francis
-Email: obiignatiusfrancis@outlook.com
-GitHub: IgnatiusFrancis
-...
+- **Name: Ignatius Francis**
+- **Email: obiignatiusfrancis@outlook.com**
+- **GitHub: IgnatiusFrancis**
+  ...
 
 Feel free to explore the API and refer to the [API Documentation](https://documenter.getpostman.com/view/19595090/2sA3kUHhaE) for detailed information on each endpoint and their functionalities.
