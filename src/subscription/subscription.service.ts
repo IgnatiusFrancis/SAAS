@@ -119,66 +119,10 @@ export class SubscriptionService {
             },
           });
         }
-      } else if (event.event === 'subscription.cancelled') {
-        this.logger.debug(`Subscription cancellation webhook received`);
-        const { subscription_code } = event.data;
-
-        const subscription = await this.prisma.subscription.findUnique({
-          where: { subscriptionCode: subscription_code },
-        });
-
-        if (subscription) {
-          await this.prisma.subscription.update({
-            where: { subscriptionCode: subscription_code },
-            data: { status: 'cancelled' },
-          });
-
-          const user = await this.prisma.user.findUnique({
-            where: { id: subscription.userId },
-          });
-
-          if (user) {
-            await this.prisma.user.update({
-              where: { id: user.id },
-              data: { subscriptionActive: Status.Inactive },
-            });
-          }
-        }
       }
     } catch (error) {
       this.logger.error('Error handling webhook:', error);
       throw error;
-    }
-  }
-
-  public async cancelSubscription(subscriptionId: string) {
-    try {
-      this.logger.debug(`Cancelling subscription with Id: ${subscriptionId}`);
-
-      const subscription = await this.prisma.subscription.findUnique({
-        where: { id: subscriptionId, status: 'active' },
-      });
-      console.log(subscription.subscriptionCode);
-      if (!subscription) {
-        throw new HttpException('No Subscription found', HttpStatus.NOT_FOUND);
-      }
-      const url = `${this.baseUrl}/subscription/disable`;
-      const headers = { Authorization: `Bearer ${this.secretKey}` };
-
-      const data = {
-        code: subscription.subscriptionCode,
-        token: headers,
-      };
-
-      const response = await firstValueFrom(this.httpService.post(url, data));
-
-      this.logger.debug(
-        `Subscription cancelled successfully: ${response.data}`,
-      );
-      return response.data;
-    } catch (error) {
-      this.logger.error('Error cancelling subscription:', error.message);
-      throw new Error(`Error cancelling subscription: ${error.message}`);
     }
   }
 }

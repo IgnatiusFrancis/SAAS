@@ -21,25 +21,21 @@ import { BullModule } from '@nestjs/bull';
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
-        const logger = new Logger('BullModuleConfig');
-        const environment = configService.get<string>('NODE_ENV');
-        logger.log(`Current environment: ${environment}`);
         const isProduction =
           configService.get<string>('NODE_ENV') === 'production';
         const redisOptions = {
-          host: isProduction
-            ? configService.get<string>('REDIS_HOST')
-            : 'localhost',
-          port: isProduction
-            ? parseInt(configService.get<string>('REDIS_PORT'))
-            : 6379,
-          ...(isProduction && {
-            password: configService.get<string>('REDIS_PASSWORD'),
-          }),
+          host: 'localhost',
+          port: 6379,
         };
 
         return {
-          redis: redisOptions,
+          redis: isProduction
+            ? `redis://:${configService.get<string>(
+                'REDIS_PASSWORD',
+              )}@${configService.get<string>(
+                'REDIS_HOST',
+              )}:${configService.get<string>('REDIS_PORT')}`
+            : redisOptions,
         };
       },
       inject: [ConfigService],

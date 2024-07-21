@@ -13,7 +13,6 @@ export class ImageService {
     try {
       this.logger.verbose(`Adding image to queue`);
 
-      // Add the job to the queue
       const job: Job = await this.fileUploadQueue.add(
         'upload',
         { userId, file },

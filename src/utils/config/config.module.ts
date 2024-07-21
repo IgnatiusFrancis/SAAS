@@ -18,9 +18,13 @@ import * as Joi from 'joi';
         CLOUDINARY_API_SECRET: Joi.string().required(),
         CLOUDINARY_API_KEY: Joi.string().required(),
         PAYSTACK_SECRETKEY: Joi.string().required(),
-        REDIS_HOST: Joi.string().required(),
-        REDIS_PORT: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
+        REDIS_HOST: Joi.string().required().optional(),
+        REDIS_PORT: Joi.string().required().optional(),
         REDIS_PASSWORD: Joi.string().optional(),
+        NODE_ENV: Joi.string()
+          .valid('production', 'development')
+          .default('development'),
       }),
     }),
   ],

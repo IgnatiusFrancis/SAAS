@@ -4,15 +4,11 @@ import {
   ExecutionContext,
   ForbiddenException,
 } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
 import { PrismaService } from 'src/utils/prisma';
 
 @Injectable()
 export class SubscriptionGuard implements CanActivate {
-  constructor(
-    private reflector: Reflector,
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();

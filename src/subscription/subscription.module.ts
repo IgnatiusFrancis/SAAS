@@ -5,24 +5,17 @@ import { HttpModule } from '@nestjs/axios';
 import { PrismaService } from 'src/utils/prisma';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthService } from 'src/utils/token.generators';
-import { RedisService } from './redis.service';
 
 @Module({
   imports: [
     HttpModule.registerAsync({
       useFactory: () => ({
-        timeout: 5000,
-        maxRedirects: 5,
+        timeout: 3000,
+        maxRedirects: 2,
       }),
     }),
   ],
   controllers: [SubscriptionController],
-  providers: [
-    SubscriptionService,
-    PrismaService,
-    AuthService,
-    JwtAuthService,
-    RedisService,
-  ],
+  providers: [SubscriptionService, PrismaService, AuthService, JwtAuthService],
 })
 export class SubscriptionModule {}
