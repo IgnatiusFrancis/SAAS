@@ -24,16 +24,18 @@ describe('AuthService', () => {
           useValue: {
             user: {
               create: jest.fn().mockReturnValue(mockAuthDto),
-              findUnique: jest.fn().mockImplementation(() => {
-                if (callCounter == 0) {
-                  callCounter++;
-                  return null;
-                } else {
-                  return mockAuthDto;
-                }
-              }),
-              //.mockReturnValueOnce(null), // For signup
-              //.mockReturnValueOnce(mockAuthDto), // For signin
+              findUnique: jest
+                .fn()
+                .mockImplementation(() => {
+                  if (callCounter == 0) {
+                    callCounter++;
+                    return null;
+                  } else {
+                    return mockAuthDto;
+                  }
+                })
+                //.mockReturnValueOnce(null), // For signup
+                .mockReturnValueOnce(mockAuthDto), // For signin
               // findUnique: jest.fn().mockReturnValueOnce(null),
             },
           },
