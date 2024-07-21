@@ -135,10 +135,10 @@ export class SubscriptionService {
   }
 
   private verifySignature(req: Request): boolean {
-    this.logger.warn('Verifying signature', this.secretKey, req.body);
+    const payload = JSON.stringify(req.body);
     const hash = crypto
       .createHmac('sha512', this.secretKey)
-      .update(JSON.stringify(req.body))
+      .update(payload)
       .digest('hex');
     return hash === req.headers['x-paystack-signature'];
   }
