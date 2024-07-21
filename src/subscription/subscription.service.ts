@@ -135,6 +135,7 @@ export class SubscriptionService {
   }
 
   private verifySignature(req: Request): boolean {
+    this.logger.warn('Verifying signature', req);
     const hash = crypto
       .createHmac('sha512', this.secretKey)
       .update(JSON.stringify(req.body))
