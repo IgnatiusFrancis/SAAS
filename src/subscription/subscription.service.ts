@@ -123,9 +123,6 @@ export class SubscriptionService {
         }
 
         res.status(200).send();
-      } else {
-        this.logger.error('Invalid webhook signature');
-        res.status(400).send('Invalid signature');
       }
     } catch (error) {
       this.logger.error('Error handling webhook:', error);
