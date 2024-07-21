@@ -1,6 +1,6 @@
-# Wallet System API Documentation
+#SAAS API Documentation
 
-Welcome to the Wallet System API documentation. This API facilitates the management of user wallets and transactions using Paystack integration. Below, you will find information on setting up, running, and testing the API.
+This is a subscription-based application using Paystack, BullMQ, and NestJS modular architecture.
 
 ## Table of Contents
 
@@ -17,34 +17,54 @@ Welcome to the Wallet System API documentation. This API facilitates the managem
 
 # Prerequisites
 
-- Nestjs
-- Express
-- TypeScript
-- Paystack API
-- Prisma
-- PostgreSQL database
+-Node.js: Ensure you have Node.js installed (version 14.x or higher recommended).
+-NestJS: Familiarity with the NestJS framework.
+-TypeScript: Knowledge of TypeScript.
+-Paystack: For payment and subscription management.
+-Prisma: For ORM with PostgreSQL.
+-PostgreSQL: Database for storing data.
+-Cloudinary: For image hosting and management.
+-Redis: Used for BullMQ (task queue management). You need to have Redis installed locally or set up a Redis cloud instance.
 
 # Installation
 
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/IgnatiusFrancis/Thrindle.git
-   cd WalletSystem
+   git clone https://github.com/IgnatiusFrancis/SAAS.git
 
-   # Install dependencies:
-   npm install
    ```
+
+2. Redis Setup:
+
+Local Redis: If you want to run Redis locally, ensure Redis is installed and running.
+Redis Cloud: Alternatively, set up a Redis cloud instance and configure the connection details in your .env file.
+
+# Install dependencies:
+
+npm install
+
+````
 
 # Configuration
 
 Create a .env file in the root directory and configure the following environment variables:
 
 ```env
-TEST_SECRET=your_paystack_api_key
-JWT_SECRET=your secret key
-DATABASE_URL=mongodb+srv://<username>:<password>@cluster0.3lx6pbq.mongodb.net/dbname
-```
+DATABASE_URL="postgres://user:password@host:port/dbname"
+PAYSTACK_SECRETKEY="your_paystack_secret_key"
+PAYSTACK_BASEURL="https://api.paystack.co"
+PORT="3000"
+CLOUDINARY_NAME="your_cloudinary_name"
+CLOUDINARY_API_KEY="your_cloudinary_api_key"
+CLOUDINARY_API_SECRET="your_cloudinary_api_secret"
+JWT_SECRET="your_jwt_secret_key"
+REDIS_PASSWORD="your_redis_password"
+REDIS_HOST="localhost" # Or your Redis cloud instance host
+REDIS_PORT="6379" # Or your Redis cloud instance port
+NODE_ENV="" # development by default
+
+````
 
 # Usage
 
@@ -53,17 +73,15 @@ DATABASE_URL=mongodb+srv://<username>:<password>@cluster0.3lx6pbq.mongodb.net/db
 To start the API server, run the following command:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
+# Development mode (auto-restarts on file changes)
 $ npm run start:dev
 
-# production mode
+# Production mode
 $ npm run start:prod
+
 ```
 
-The API will be accessible at  [API](https://wallet-jmm3.onrender.com) 
+The API will be accessible at [API](https://taskass-zc54.onrender.com)
 
 ## API Endpoints
 
@@ -72,67 +90,21 @@ The API will be accessible at  [API](https://wallet-jmm3.onrender.com)
 - **URL**: /auth/signup
 - **Method**: POST
 - **Request Body**: `{ "email": "user@example.com", "password": "your_password" }`
-- **Response**: Detailed response information is available in the [API Documentation](https://documenter.getpostman.com/view/19595090/2s9YeD9Dox)
+- **Response**: Detailed response information is available in the [API Documentation](https://documenter.getpostman.com/view/19595090/2sA3kUHhaE)
 
 ### Sign In
 
 - **URL**: /auth/signin
 - **Method**: POST
 - **Request Body**: `{ "email": "user@example.com", "password": "your_password" }`
-- **Response**: Detailed response information is available in the [API Documentation](https://documenter.getpostman.com/view/19595090/2s9YeD9Dox)
+- **Response**: Detailed response information is available in the [API Documentation](https://documenter.getpostman.com/view/19595090/2sA3kUHhaE)
 
-### Create Wallet
+### Create subscription
 
-- **URL**: /wallet/create
+- **URL**: /subscription
 - **Method**: POST
-- **Request Body**: `{ "currency": "NGN", "name": "James" }`
-- **Response**: Detailed response information is available in the [API Documentation](https://documenter.getpostman.com/view/19595090/2s9YeD9Dox)
-
-### Fund Wallet
-
-- **URL**: /wallet/:walletId
-- **Method**: PATCH
-- **Request Body**: `{ "walletId": "your_wallet_id", "amount": "500" }`
-- **Response**: Detailed response information is available in the [API Documentation](https://documenter.getpostman.com/view/19595090/2s9YeD9Dox)
-
-### VERIFY Wallet PAYMENT
-
-- **URL**: /wallet/verify/:reference
-- **Method**: GET
-- **Request Body**: `{ "reference": "your_transfer_reference" }`
-- **Response**: Detailed response information is available in the [API Documentation](https://documenter.getpostman.com/view/19595090/2s9YeD9Dox)
-
-### GET Wallet
-
-- **URL**: /wallet/:walletId
-- **Method**: GET
-- **Response**: Detailed response information is available in the [API Documentation](https://documenter.getpostman.com/view/19595090/2s9YeD9Dox)
-
-### Wallet To Wallet Transfer
-
-- **URL**: /transfer/:walletId
-- **Method**: POST
-- **Request Body**: `{ "senderWalletId": "sender_wallet_id", "receiverWalletId": "receiver_wallet_id", "amount": "300" }`
-- **Response**: Detailed response information is available in the [API Documentation](https://documenter.getpostman.com/view/19595090/2s9YeD9Dox)
-
-### Wallet To Banks Transfer
-
-- **URL**: /transfer/bank/:walletId
-- **Method**: POST
-- **Request Body**: `{CreateTransferRecipientDto }`
-- **Response**: Detailed response information is available in the [API Documentation](https://documenter.getpostman.com/view/19595090/2s9YeD9Dox)
-
-### Get All Transactions
-
-- **URL**: /transfer/transactions
-- **Method**: GET
-- **Response**: Detailed response information is available in the [API Documentation](https://documenter.getpostman.com/view/19595090/2s9YeD9Dox)
-
-### Get Transaction By Transaction ID
-
-- **URL**: /transfer/:txnId
-- **Method**: GET
-- **Response**: Detailed response information is available in the [API Documentation](https://documenter.getpostman.com/view/19595090/2s9YeD9Dox)
+- **Request Body**: `{ "amount": "5000", "plan": "Plan_Grtahahgst" }`
+- **Response**: Detailed response information is available in the [API Documentation](https://documenter.getpostman.com/view/19595090/2sA3kUHhaE)
 
 ...
 
@@ -154,7 +126,14 @@ $ npm run test:e2e
 
 ## Contributing
 
-...
+To contribute to this project, please follow these guidelines:
+
+- Fork the repository.
+- Create a feature branch (git checkout -b feature/your-feature).
+- Commit your changes (git commit -am 'Add new feature').
+- Push to the branch (git push origin feature/your-feature).
+- Open a pull request.
+  ...
 
 ## License
 
@@ -162,6 +141,11 @@ $ npm run test:e2e
 
 ## Contact
 
+For any inquiries, please reach out to:
+
+Name: Ignatius Francis
+Email: obiignatiusfrancis@outlook.com
+GitHub: IgnatiusFrancis
 ...
 
-Feel free to explore the API and refer to the [API Documentation](https://documenter.getpostman.com/view/19595090/2s9YeD9Dox) for detailed information on each endpoint and their functionalities.
+Feel free to explore the API and refer to the [API Documentation](https://documenter.getpostman.com/view/19595090/2sA3kUHhaE) for detailed information on each endpoint and their functionalities.
