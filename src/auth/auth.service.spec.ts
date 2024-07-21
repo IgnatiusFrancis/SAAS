@@ -34,8 +34,8 @@ describe('AuthService', () => {
                     return mockAuthDto;
                   }
                 })
-                //.mockReturnValueOnce(null), // For signup
-                .mockReturnValueOnce(mockAuthDto), // For signin
+                .mockReturnValueOnce(null), // For signup
+              //.mockReturnValueOnce(mockAuthDto), // For signin
               // findUnique: jest.fn().mockReturnValueOnce(null),
             },
           },
@@ -60,10 +60,8 @@ describe('AuthService', () => {
       success: true,
       message: 'Signup successful',
       result: {
-        user: {
-          email: mockAuthDto.email,
-          password: mockAuthDto.password,
-        },
+        email: mockAuthDto.email,
+        password: mockAuthDto.password,
       },
     });
 

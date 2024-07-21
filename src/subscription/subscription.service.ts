@@ -122,7 +122,7 @@ export class SubscriptionService {
           });
         }
 
-        res.status(200).send();
+        res.send(200);
       }
     } catch (error) {
       this.logger.error('Error handling webhook:', error);

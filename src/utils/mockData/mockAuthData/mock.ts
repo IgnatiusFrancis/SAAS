@@ -1,4 +1,4 @@
 export const mockAuthDto = {
-  email: 'test@gmail.com',
+  email: 'best@gmail.com',
   password: '111111',
 };
