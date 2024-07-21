@@ -123,7 +123,6 @@ export class SubscriptionService {
             });
           }
         }
-
         res.status(200).send();
       } else {
         this.logger.error('Invalid webhook signature');

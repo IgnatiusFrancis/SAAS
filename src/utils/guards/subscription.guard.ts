@@ -20,7 +20,7 @@ export class SubscriptionGuard implements CanActivate {
         status: 'active',
       },
     });
-    console.log(subscription);
+
     if (!subscription) {
       throw new ForbiddenException(
         'You must have an active subscription to access this resource.',
