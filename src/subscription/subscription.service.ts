@@ -114,7 +114,8 @@ export class SubscriptionService {
         this.logger.debug(
           `Webhook received for subscription cancellation: ${event.event}`,
         );
-        const { subscription_code, customer } = event.data;
+        const { subscription_code, customer, status, next_payment_date } =
+          event.data;
 
         const user = await this.authService.getUserByEmail(customer.email);
         if (user) {
@@ -123,7 +124,7 @@ export class SubscriptionService {
           );
           await this.prisma.subscription.update({
             where: { subscriptionCode: subscription_code },
-            data: { status: 'cancelled' },
+            data: { status, nextPaymentDate: new Date(next_payment_date) },
           });
 
           this.logger.debug(`Updating user subscription status to inactive`);
@@ -163,18 +164,6 @@ export class SubscriptionService {
       );
 
       this.logger.debug(`Subscription API response: ${response.data}`);
-
-      if (response.data.status) {
-        await this.prisma.subscription.update({
-          where: { id: subscriptionId },
-          data: { status: 'cancelled' },
-        });
-
-        this.logger.debug('Subscription cancelled successfully');
-        return { message: 'Subscription cancelled successfully' };
-      } else {
-        throw new Error('Failed to cancel subscription at Paystack');
-      }
     } catch (error) {
       this.logger.error('Error cancelling subscription:', error.message);
       throw error;
@@ -189,7 +178,7 @@ export class SubscriptionService {
       }
 
       const subscriptions = await this.prisma.subscription.findMany({
-        where: { userId: user.id, status: 'active' },
+        where: { userId: user.id },
       });
 
       return { status: 'Success', subscriptions };
