@@ -17,14 +17,14 @@ This is a subscription-based application using Paystack, BullMQ, and NestJS modu
 
 # Prerequisites
 
--Node.js: Ensure you have Node.js installed (version 14.x or higher recommended).
--NestJS: Familiarity with the NestJS framework.
--TypeScript: Knowledge of TypeScript.
--Paystack: For payment and subscription management.
--Prisma: For ORM with PostgreSQL.
--PostgreSQL: Database for storing data.
--Cloudinary: For image hosting and management.
--Redis: Used for BullMQ (task queue management). You need to have Redis installed locally or set up a Redis cloud instance.
+- Node.js: Ensure you have Node.js installed (version 14.x or higher recommended)
+- NestJS: Familiarity with the NestJS framework.
+- TypeScript: Knowledge of TypeScript.
+- Paystack: For payment and subscription management.
+- Prisma: For ORM with PostgreSQL.
+- PostgreSQL: Database for storing data.
+- Cloudinary: For image hosting and management.
+- Redis: Used for BullMQ (task queue management). You need to have Redis installed locally or set up a Redis cloud instance.
 
 # Installation
 
