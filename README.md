@@ -44,7 +44,6 @@ Redis Cloud: Alternatively, set up a Redis cloud instance and configure the conn
 
 npm install
 
-````
 
 # Configuration
 
