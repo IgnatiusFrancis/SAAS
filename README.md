@@ -106,9 +106,23 @@ The API will be accessible at [API](https://taskass-zc54.onrender.com)
 - **Request Body**: `{ "amount": "5000", "plan": "Plan_Grtahahgst" }`
 - **Response**: Detailed response information is available in the [API Documentation](https://documenter.getpostman.com/view/19595090/2sA3kUHhaE)
 
+### Cancel subscription
+
+- **URL**: /subscription/cancel/subscriptionId
+- **Method**: POST
+- **Response**: Detailed response information is available in the [API Documentation](https://documenter.getpostman.com/view/19595090/2sA3kUHhaE)
+
+### Upload file
+
+- **URL**: /image/upload
+- **Method**: POST
+- **Response**: Detailed response information is available in the [API Documentation](https://documenter.getpostman.com/view/19595090/2sA3kUHhaE)
+
 ...
 
 ## Testing
+
+Testing can be done through the terminal. Implemented integration and unit tests.
 
 ```bash
 # unit tests
