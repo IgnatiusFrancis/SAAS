@@ -12,8 +12,8 @@ import {
 import { SubscriptionService } from './subscription.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { User } from '@prisma/client';
-import { CurrentUser } from 'src/utils/decorators';
-import { JwtGuard } from 'src/utils/guards/jwtAuth.guard';
+import { CurrentUser } from '../utils/decorators';
+import { JwtGuard } from '../utils/guards/jwtAuth.guard';
 import { Response } from 'express';
 
 @Controller('subscription')

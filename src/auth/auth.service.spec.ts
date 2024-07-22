@@ -1,7 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { PrismaService } from '../utils/prisma';
-import { mockAuthDto } from '../utils/mockData/mockAuthData/mock';
+import {
+  mockAuthDto,
+  mockReturnedValue,
+} from '../utils/mockData/mockAuthData/mock';
 import { JwtAuthService } from '../utils/token.generators';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
@@ -9,11 +12,11 @@ import * as bcrypt from 'bcryptjs';
 describe('AuthService', () => {
   let service: AuthService;
   let prismaService: PrismaService;
-  let callCounter = 0;
 
   beforeEach(async () => {
-    // Mock bcrypt.compare to always return true during the test
+    /******************** This will always return true for bcypt *******************/
     jest.spyOn(bcrypt, 'compare').mockImplementation(async () => true);
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
@@ -24,19 +27,18 @@ describe('AuthService', () => {
           useValue: {
             user: {
               create: jest.fn().mockReturnValue(mockAuthDto),
-              findUnique: jest
-                .fn()
-                .mockImplementation(() => {
-                  if (callCounter == 0) {
-                    callCounter++;
-                    return null;
-                  } else {
+              findUnique: jest.fn((args) => {
+                console.log(args);
+                if (args.where.email === mockAuthDto.email) {
+                  if (args.include) {
+                    // For sign-in: return mock user
                     return mockAuthDto;
                   }
-                })
-                .mockReturnValueOnce(null) // For signup
-                .mockReturnValueOnce(mockAuthDto), // For signin
-              // findUnique: jest.fn().mockReturnValueOnce(null),
+                  // For sign-up: user does not exist
+                  return null;
+                }
+                return null;
+              }),
             },
           },
         },
@@ -47,20 +49,12 @@ describe('AuthService', () => {
     prismaService = module.get<PrismaService>(PrismaService);
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('should sign up successfully', async () => {
-    callCounter = 0;
     // Mock the prismaService.user.findUnique method
     const findUniqueSpy = jest.spyOn(prismaService.user, 'findUnique');
 
     // Call the service method
-    const result = await service.signup({
-      email: mockAuthDto.email,
-      password: mockAuthDto.password,
-    });
+    const result = await service.signup(mockAuthDto);
 
     // Assertions
     expect(result).toEqual({
@@ -68,7 +62,7 @@ describe('AuthService', () => {
       message: 'Signup successful',
       result: {
         email: mockAuthDto.email,
-        //password: mockAuthDto.password,
+        subscriptionActive: mockAuthDto.subscriptionActive,
       },
     });
 
@@ -77,26 +71,33 @@ describe('AuthService', () => {
       where: { email: mockAuthDto.email },
     });
     expect(findUniqueSpy).toHaveBeenCalledTimes(1);
+
+    // Verify create method was called
+    expect(prismaService.user.create).toHaveBeenCalledWith({
+      data: {
+        email: mockAuthDto.email,
+        password: expect.any(String),
+      },
+    });
+    expect(prismaService.user.create).toHaveBeenCalledTimes(1);
   });
 
   it('should sign in successfully', async () => {
     // Mock the prismaService.user.findUnique method
     const findUniqueSpy = jest.spyOn(prismaService.user, 'findUnique');
-    console.log('result signin', mockAuthDto);
-    // Call the service method
 
-    const result = await service.signin({
-      email: mockAuthDto.email,
-      password: mockAuthDto.password,
-    });
+    // Call the service method
+    const result = await service.signin(mockAuthDto);
 
     // Assertions
     expect(result.success).toBe(true);
     expect(result.message).toBe('Login successful');
+    expect(result.result).toBeDefined();
 
     // Verify findUniqueSpy calls
     expect(findUniqueSpy).toHaveBeenCalledWith({
       where: { email: mockAuthDto.email },
+      include: { images: true, subscriptions: true },
     });
     expect(findUniqueSpy).toHaveBeenCalledTimes(1);
   });

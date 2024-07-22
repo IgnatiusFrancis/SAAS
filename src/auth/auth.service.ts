@@ -35,8 +35,6 @@ export class AuthService {
         createAuthDto.email,
         hashedPassword,
       );
-
-      //console.log('YEAHHHHHHHHH', newUser);
       return this.formatSignupResponse(newUser);
     } catch (error) {
       throw error;
@@ -44,9 +42,8 @@ export class AuthService {
   }
 
   private async verifyUser(email: string, password: string) {
-    console.log(email);
     const user = await this.getUserByEmail(email);
-    console.log(user);
+
     this.checkUserExistence(user);
 
     await this.checkPasswordMatch(password, user.password);
@@ -121,12 +118,15 @@ export class AuthService {
 
   private formatSignupResponse(newUser: User) {
     const { password, ...data } = newUser;
-    return {
+
+    const c = {
       success: true,
       message: 'Signup successful',
       result: {
         ...data,
       },
     };
+
+    return c;
   }
 }

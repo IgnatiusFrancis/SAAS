@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { ImageController } from './image.controller';
 import { ImageService } from './image.service';
 import { MulterModule } from '@nestjs/platform-express';
-import { PrismaService } from 'src/utils/prisma';
-import { JwtAuthService } from 'src/utils/token.generators';
+import { PrismaService } from '../utils/prisma';
+import { JwtAuthService } from '../utils/token.generators';
 import { BullModule } from '@nestjs/bull';
 import { ImageProcessor } from './image.processor';
 

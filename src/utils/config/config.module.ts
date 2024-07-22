@@ -23,7 +23,7 @@ import * as Joi from 'joi';
         REDIS_PORT: Joi.string().required().optional(),
         REDIS_PASSWORD: Joi.string().optional(),
         NODE_ENV: Joi.string()
-          .valid('production', 'development')
+          .valid('production', 'development', 'test')
           .default('development'),
       }),
     }),

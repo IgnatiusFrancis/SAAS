@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { SubscriptionService } from './subscription.service';
 import { SubscriptionController } from './subscription.controller';
 import { HttpModule } from '@nestjs/axios';
-import { PrismaService } from 'src/utils/prisma';
-import { AuthService } from 'src/auth/auth.service';
-import { JwtAuthService } from 'src/utils/token.generators';
+import { PrismaService } from '../utils/prisma';
+import { AuthService } from '../auth/auth.service';
+import { JwtAuthService } from '../utils/token.generators';
 
 @Module({
   imports: [

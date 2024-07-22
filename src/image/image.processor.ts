@@ -2,7 +2,7 @@ import { Processor, Process } from '@nestjs/bull';
 import { Job } from 'bull';
 import { v2 as cloudinary } from 'cloudinary';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from 'src/utils/prisma';
+import { PrismaService } from '../utils/prisma';
 import { Logger } from '@nestjs/common';
 import { UploadApiErrorResponse, UploadApiResponse, v2 } from 'cloudinary';
 import toStream = require('buffer-to-stream');

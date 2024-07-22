@@ -2,11 +2,10 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
-import { PrismaService } from 'src/utils/prisma';
-import { AuthService } from 'src/auth/auth.service';
+import { PrismaService } from '../utils/prisma';
+import { AuthService } from '../auth/auth.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { Status } from '@prisma/client';
-import * as crypto from 'crypto';
 import { Response } from 'express';
 
 @Injectable()

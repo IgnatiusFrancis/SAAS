@@ -9,10 +9,10 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageService } from './image.service';
 import { UseGuards } from '@nestjs/common';
-import { JwtGuard } from 'src/utils/guards/jwtAuth.guard';
-import { CurrentUser } from 'src/utils/decorators';
+import { JwtGuard } from '../utils/guards/jwtAuth.guard';
+import { CurrentUser } from '../utils/decorators';
 import { User } from '@prisma/client';
-import { SubscriptionGuard } from 'src/utils/guards/subscription.guard';
+import { SubscriptionGuard } from '../utils/guards/subscription.guard';
 
 @Controller('image')
 export class ImageController {
