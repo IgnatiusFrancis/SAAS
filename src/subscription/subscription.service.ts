@@ -81,7 +81,7 @@ export class SubscriptionService {
             `About updating subscription details from processed webhook`,
           );
           await this.prisma.subscription.upsert({
-            where: { subscriptionCode: subscription_code },
+            where: { userId: user.id },
             update: {
               plan: plan.name,
               status,
