@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
@@ -58,7 +58,10 @@ export class SubscriptionService {
 
   public async handleWebhook(event: any, res: Response) {
     try {
-      if (event.event === 'subscription.create') {
+      if (
+        event.event === 'subscription.create' &&
+        event.event === 'charge.success'
+      ) {
         this.logger.debug(
           `Webhook received and about to process: ${event.event}`,
         );
@@ -69,6 +72,7 @@ export class SubscriptionService {
           plan,
           customer,
           next_payment_date,
+          email_token,
         } = event.data;
 
         const user = await this.authService.getUserByEmail(customer.email);
@@ -82,6 +86,7 @@ export class SubscriptionService {
               plan: plan.name,
               status,
               amount,
+              email_token,
               nextPaymentDate: new Date(next_payment_date),
             },
             create: {
@@ -90,6 +95,7 @@ export class SubscriptionService {
               plan: plan.name,
               status,
               amount,
+              email_token,
               nextPaymentDate: new Date(next_payment_date),
             },
           });
@@ -104,29 +110,67 @@ export class SubscriptionService {
         }
 
         this.logger.debug(`Successfully updated all fields`);
-      } else if (event.event === 'subscription.update') {
-        this.logger.debug(`Subscription update webhook received`);
-        const { subscription_code, status, next_payment_date } = event.data;
-
-        const subscription = await this.prisma.subscription.findUnique({
-          where: { id: subscription_code },
-        });
-
-        if (subscription) {
-          await this.prisma.subscription.update({
-            where: { id: subscription_code },
-            data: {
-              status,
-              nextPaymentDate: new Date(next_payment_date),
-            },
-          });
-        }
-
         res.send(200);
       }
     } catch (error) {
       this.logger.error('Error handling webhook:', error);
       throw error;
+    }
+  }
+
+  public async cancelSubscription(subscriptionId: string) {
+    try {
+      this.logger.debug(`Cancelling subscription with Id: ${subscriptionId}`);
+
+      const subscription = await this.prisma.subscription.findFirstOrThrow({
+        where: { id: subscriptionId, status: 'active' },
+      });
+
+      const url = `${this.baseUrl}/subscription/disable`;
+      const headers = { Authorization: `Bearer ${this.secretKey}` };
+      const data = {
+        code: subscription.subscriptionCode,
+        token: subscription.email_token,
+      };
+
+      const response = await firstValueFrom(
+        this.httpService.post(url, data, { headers }),
+      );
+
+      this.logger.debug(`Subscription API response: ${response.data}`);
+
+      if (response.data.status) {
+        await this.prisma.subscription.update({
+          where: { id: subscriptionId },
+          data: { status: 'cancelled' },
+        });
+
+        this.logger.debug('Subscription cancelled successfully');
+        return { message: 'Subscription cancelled successfully' };
+      } else {
+        throw new Error('Failed to cancel subscription at Paystack');
+      }
+    } catch (error) {
+      this.logger.error('Error cancelling subscription:', error.message);
+      throw error;
+    }
+  }
+
+  public async fetchSubscriptions(userId: string) {
+    try {
+      const user = await this.authService.getUserById(userId);
+      if (!user) {
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      }
+
+      const subscriptions = await this.prisma.subscription.findMany({
+        where: { id: user.id, status: 'active' },
+      });
+
+      return { status: 'Success', subscriptions };
+    } catch (error) {
+      this.logger.error('Error Fetching subscription:', error.message);
+      throw new Error(`Error Fetching subscription: ${error.message}`);
     }
   }
 }

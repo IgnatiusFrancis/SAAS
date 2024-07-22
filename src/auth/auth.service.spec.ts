@@ -34,8 +34,8 @@ describe('AuthService', () => {
                     return mockAuthDto;
                   }
                 })
-                .mockReturnValueOnce(null), // For signup
-              //.mockReturnValueOnce(mockAuthDto), // For signin
+                .mockReturnValueOnce(null) // For signup
+                .mockReturnValueOnce(mockAuthDto), // For signin
               // findUnique: jest.fn().mockReturnValueOnce(null),
             },
           },
@@ -54,7 +54,7 @@ describe('AuthService', () => {
 
     // Call the service method
     const result = await service.signup(mockAuthDto);
-
+    console.log(result);
     // Assertions
     expect(result).toEqual({
       success: true,
@@ -75,10 +75,10 @@ describe('AuthService', () => {
   it('should sign in successfully', async () => {
     // Mock the prismaService.user.findUnique method
     const findUniqueSpy = jest.spyOn(prismaService.user, 'findUnique');
-
+    console.log('result signin', mockAuthDto);
     // Call the service method
     const result = await service.signin(mockAuthDto);
-
+    console.log('result signin', result);
     // Assertions
     expect(result.success).toBe(true);
     expect(result.message).toBe('Login successful');

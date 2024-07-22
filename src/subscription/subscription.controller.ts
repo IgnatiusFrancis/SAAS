@@ -6,6 +6,8 @@ import {
   Req,
   Res,
   Logger,
+  Param,
+  Get,
 } from '@nestjs/common';
 import { SubscriptionService } from './subscription.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
@@ -37,5 +39,23 @@ export class SubscriptionController {
     this.logger.verbose('Received Paystack webhook', req.body);
     const event = req.body;
     await this.subscriptionService.handleWebhook(event, res);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post('cancel/:subscriptionId')
+  public async cancelSubscription(
+    @CurrentUser() user: User,
+    @Param('subscriptionId') subscriptionId: string,
+  ) {
+    return this.subscriptionService.cancelSubscription(subscriptionId);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get()
+  public async fetchSubscriptions(
+    @CurrentUser() user: User,
+    @Param('subscriptionId') subscriptionId: string,
+  ) {
+    return this.subscriptionService.fetchSubscriptions(subscriptionId);
   }
 }

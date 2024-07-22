@@ -25,6 +25,7 @@ model Subscription {
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   plan              String
   status            String
+  email_token       String
   amount            Int   
   nextPaymentDate   DateTime
   createdAt         DateTime @default(now())
