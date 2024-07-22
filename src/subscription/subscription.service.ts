@@ -58,10 +58,7 @@ export class SubscriptionService {
 
   public async handleWebhook(event: any, res: Response) {
     try {
-      if (
-        event.event === 'subscription.create' &&
-        event.event === 'charge.success'
-      ) {
+      if (event.event === 'subscription.create') {
         this.logger.debug(
           `Webhook received and about to process: ${event.event}`,
         );
@@ -188,9 +185,7 @@ export class SubscriptionService {
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       }
 
-      const subscriptions = await this.prisma.subscription.findMany({
-        where: { id: user.id, status: 'active' },
-      });
+      const subscriptions = await this.prisma.subscription.findMany({});
 
       return { status: 'Success', subscriptions };
     } catch (error) {
