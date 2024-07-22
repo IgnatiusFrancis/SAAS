@@ -58,10 +58,7 @@ export class SubscriptionService {
 
   public async handleWebhook(event: any, res: Response) {
     try {
-      if (
-        event.event === 'subscription.create' &&
-        event.event === 'charge.success'
-      ) {
+      if (event.event === 'subscription.create') {
         this.logger.debug(
           `Webhook received and about to process: ${event.event}`,
         );
