@@ -38,6 +38,7 @@ export class SubscriptionController {
   async webhook(@Req() req: Request, @Res() res: Response) {
     this.logger.verbose('Received Paystack webhook', req.body);
     const event = req.body;
+    res.sendStatus(200);
     await this.subscriptionService.handleWebhook(event, res);
   }
 

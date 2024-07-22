@@ -58,10 +58,7 @@ export class SubscriptionService {
 
   public async handleWebhook(event: any, res: Response) {
     try {
-      if (
-        event.event === 'subscription.create' ||
-        event.event === 'charge.success'
-      ) {
+      if (event.event === 'subscription.create') {
         this.logger.debug(
           `Webhook received and about to process: ${event.event}`,
         );
@@ -81,7 +78,7 @@ export class SubscriptionService {
             `About updating subscription details from processed webhook`,
           );
           await this.prisma.subscription.upsert({
-            where: { userId: user.id },
+            where: { subscriptionCode: subscription_code },
             update: {
               plan: plan.name,
               userId: user.id,
