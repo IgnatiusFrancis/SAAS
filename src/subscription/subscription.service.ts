@@ -84,6 +84,8 @@ export class SubscriptionService {
             where: { userId: user.id },
             update: {
               plan: plan.name,
+              userId: user.id,
+              subscriptionCode: subscription_code,
               status,
               amount,
               email_token,
