@@ -106,24 +106,24 @@ export class AuthService {
   }
 
   private formatLoginResponse(user: User, token: string) {
-    //const { password, ...data } = user;
+    const { password, ...data } = user;
     return {
       success: true,
       message: 'Login successful',
       result: {
-        ...user,
+        ...data,
         token,
       },
     };
   }
 
   private formatSignupResponse(newUser: User) {
-    // const { password, ...data } = newUser;
+    const { password, ...data } = newUser;
     return {
       success: true,
       message: 'Signup successful',
       result: {
-        ...newUser,
+        ...data,
       },
     };
   }
