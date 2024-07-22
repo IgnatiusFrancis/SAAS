@@ -112,6 +112,12 @@ The API will be accessible at [API](https://taskass-zc54.onrender.com)
 - **Method**: POST
 - **Response**: Detailed response information is available in the [API Documentation](https://documenter.getpostman.com/view/19595090/2sA3kUHhaE)
 
+ ### Get All user subscriptions
+
+- **URL**: /subscription
+- **Method**: GET
+- **Response**: Detailed response information is available in the [API Documentation](https://documenter.getpostman.com/view/19595090/2sA3kUHhaE)
+
 ### Upload file
 
 - **URL**: /image/upload
