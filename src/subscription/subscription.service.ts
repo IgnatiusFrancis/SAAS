@@ -58,7 +58,10 @@ export class SubscriptionService {
 
   public async handleWebhook(event: any, res: Response) {
     try {
-      if (event.event === 'subscription.create') {
+      if (
+        event.event === 'subscription.create' ||
+        event.event === 'charge.success'
+      ) {
         this.logger.debug(
           `Webhook received and about to process: ${event.event}`,
         );
@@ -109,7 +112,7 @@ export class SubscriptionService {
         }
 
         this.logger.debug(`Successfully updated all fields`);
-        res.send(200);
+        res.sendStatus(200);
       } else if (event.event === 'subscription.not_renew') {
         this.logger.debug(
           `Webhook received for subscription cancellation: ${event.event}`,
@@ -133,7 +136,7 @@ export class SubscriptionService {
           });
 
           this.logger.debug(`Successfully cancelled user subscription`);
-          res.send(200);
+          res.sendStatus(200);
         }
       }
     } catch (error) {
