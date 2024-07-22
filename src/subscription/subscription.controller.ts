@@ -52,10 +52,7 @@ export class SubscriptionController {
 
   @UseGuards(JwtGuard)
   @Get()
-  public async fetchSubscriptions(
-    @CurrentUser() user: User,
-    @Param('subscriptionId') subscriptionId: string,
-  ) {
-    return this.subscriptionService.fetchSubscriptions(subscriptionId);
+  public async fetchSubscriptions(@CurrentUser() user: User) {
+    return this.subscriptionService.fetchSubscriptions(user.id);
   }
 }
