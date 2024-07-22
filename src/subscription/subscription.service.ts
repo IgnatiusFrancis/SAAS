@@ -134,7 +134,7 @@ export class SubscriptionService {
           });
 
           this.logger.debug(`Successfully cancelled user subscription`);
-          res.sendStatus(200);
+          res.send(200);
         }
       }
     } catch (error) {
