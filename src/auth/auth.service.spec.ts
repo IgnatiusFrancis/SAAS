@@ -1,10 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { PrismaService } from '../utils/prisma';
-import {
-  mockAuthDto,
-  mockReturnedValue,
-} from '../utils/mockData/mockAuthData/mock';
+import { mockAuthDto } from '../utils/mockData/mockAuthData/mock';
 import { JwtAuthService } from '../utils/token.generators';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
