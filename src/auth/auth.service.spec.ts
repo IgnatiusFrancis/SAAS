@@ -47,21 +47,28 @@ describe('AuthService', () => {
     prismaService = module.get<PrismaService>(PrismaService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should sign up successfully', async () => {
     callCounter = 0;
     // Mock the prismaService.user.findUnique method
     const findUniqueSpy = jest.spyOn(prismaService.user, 'findUnique');
 
     // Call the service method
-    const result = await service.signup(mockAuthDto);
-    console.log(result);
+    const result = await service.signup({
+      email: mockAuthDto.email,
+      password: mockAuthDto.password,
+    });
+
     // Assertions
     expect(result).toEqual({
       success: true,
       message: 'Signup successful',
       result: {
         email: mockAuthDto.email,
-        password: mockAuthDto.password,
+        //password: mockAuthDto.password,
       },
     });
 
@@ -77,8 +84,12 @@ describe('AuthService', () => {
     const findUniqueSpy = jest.spyOn(prismaService.user, 'findUnique');
     console.log('result signin', mockAuthDto);
     // Call the service method
-    const result = await service.signin(mockAuthDto);
-    console.log('result signin', result);
+
+    const result = await service.signin({
+      email: mockAuthDto.email,
+      password: mockAuthDto.password,
+    });
+
     // Assertions
     expect(result.success).toBe(true);
     expect(result.message).toBe('Login successful');

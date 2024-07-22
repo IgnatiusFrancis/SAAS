@@ -111,6 +111,31 @@ export class SubscriptionService {
 
         this.logger.debug(`Successfully updated all fields`);
         res.send(200);
+      } else if (event.event === 'subscription.not_renew') {
+        this.logger.debug(
+          `Webhook received for subscription cancellation: ${event.event}`,
+        );
+        const { subscription_code, customer } = event.data;
+
+        const user = await this.authService.getUserByEmail(customer.email);
+        if (user) {
+          this.logger.debug(
+            `About to cancel subscription for user: ${user.id}`,
+          );
+          await this.prisma.subscription.update({
+            where: { subscriptionCode: subscription_code },
+            data: { status: 'cancelled' },
+          });
+
+          this.logger.debug(`Updating user subscription status to inactive`);
+          await this.prisma.user.update({
+            where: { id: user.id },
+            data: { subscriptionActive: Status.Inactive },
+          });
+
+          this.logger.debug(`Successfully cancelled user subscription`);
+          res.sendStatus(200);
+        }
       }
     } catch (error) {
       this.logger.error('Error handling webhook:', error);

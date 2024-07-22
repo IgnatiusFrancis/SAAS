@@ -36,6 +36,7 @@ export class AuthService {
         hashedPassword,
       );
 
+      console.log('YEAHHHHHHHHH', newUser);
       return this.formatSignupResponse(newUser);
     } catch (error) {
       throw error;
@@ -43,8 +44,9 @@ export class AuthService {
   }
 
   private async verifyUser(email: string, password: string) {
+    console.log(email);
     const user = await this.getUserByEmail(email);
-
+    console.log(user);
     this.checkUserExistence(user);
 
     await this.checkPasswordMatch(password, user.password);
