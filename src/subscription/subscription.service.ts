@@ -147,10 +147,17 @@ export class SubscriptionService {
     try {
       this.logger.debug(`Cancelling subscription with Id: ${subscriptionId}`);
 
-      const subscription = await this.prisma.subscription.findFirstOrThrow({
+      const subscription = await this.prisma.subscription.findUnique({
         where: { id: subscriptionId, status: 'active' },
         include: { user: true },
       });
+
+      if (!subscription) {
+        throw new HttpException(
+          'No active subscription found',
+          HttpStatus.NOT_FOUND,
+        );
+      }
 
       const url = `${this.baseUrl}/subscription/disable`;
       const headers = { Authorization: `Bearer ${this.secretKey}` };
@@ -164,6 +171,8 @@ export class SubscriptionService {
       );
 
       this.logger.debug(`Subscription API response: ${response.data}`);
+
+      return { message: 'Subscription cancelled successfully' };
     } catch (error) {
       this.logger.error('Error cancelling subscription:', error.message);
       throw error;

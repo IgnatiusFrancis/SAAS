@@ -36,7 +36,7 @@ export class AuthService {
         hashedPassword,
       );
 
-      console.log('YEAHHHHHHHHH', newUser);
+      //console.log('YEAHHHHHHHHH', newUser);
       return this.formatSignupResponse(newUser);
     } catch (error) {
       throw error;
