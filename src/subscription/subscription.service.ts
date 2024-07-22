@@ -109,7 +109,7 @@ export class SubscriptionService {
         }
 
         this.logger.debug(`Successfully updated all fields`);
-        res.sendStatus(200);
+        //res.sendStatus(200);
       } else if (event.event === 'subscription.not_renew') {
         this.logger.debug(
           `Webhook received for subscription cancellation: ${event.event}`,
@@ -133,7 +133,7 @@ export class SubscriptionService {
           });
 
           this.logger.debug(`Successfully cancelled user subscription`);
-          res.sendStatus(200);
+          //res.sendStatus(200);
         }
       }
     } catch (error) {
